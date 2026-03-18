@@ -44,14 +44,28 @@ def calculate():
 def circle():
     if request.method == 'POST':
         # using the request method from flask to request the values that were sent to the server through the POST method
-        value = request.form['radius']
+        radius = request.form['radius']
         operation = str(request.form['circle_calculations'])
 
         if operation not in ['perimeter', 'area']:
             return render_template('circle.html',
                                    printed_result='Operation must be one of "perimeter", "area".')
         try:
-            circle_perimeter = Circle.perimeter(value)
-            return render_template('circle.html', printed_result = float(circle_perimeter))
+            radius = convert_to_float(radius)
+        except ValueError:
+            return render_template('circle.html', printed_result = 'radius should be a number')
+            
+        try:
+            c = Circle(radius)
+
+            if operation == 'perimeter':
+                result = c.perimeter()
+            elif operation == 'area':
+                result = c.area()
+
+            return render_template('circle.html', printed_result = str(result))
+        
+        except Exception:
+            return render_template('circle.html', printed_result = 'Somethign went wrong')
 
     return render_template('circle.html')
